@@ -38,7 +38,7 @@ The images marked with `(DHI)` are based on the [Docker Hardened Image (DHI)](ht
 | `3.6`     | 🟢 **Stable** | [ghcr.io/ventusforge/dhi-traefik/3.6](./dhi-traefik/3.6/Dockerfile)         |
 | `3.6-dev` | 🟢 **Stable** | [ghcr.io/ventusforge/dhi-traefik/3.6-dev](./dhi-traefik/3.6-dev/Dockerfile) |
 
-### Redis
+### Redis (DHI)
 
 [![Redis](https://github.com/ventusforge/docker-images/actions/workflows/dhi-redis.yml/badge.svg)](https://github.com/ventusforge/docker-images/actions/workflows/dhi-redis.yml)
 
@@ -46,3 +46,16 @@ The images marked with `(DHI)` are based on the [Docker Hardened Image (DHI)](ht
 |:--------|:--------------|---------------------------------------------------------------------|
 | `8`     | 🟢 **Stable** | [ghcr.io/ventusforge/dhi-redis/8](./dhi-redis/8/Dockerfile)         |
 | `8-dev` | 🟢 **Stable** | [ghcr.io/ventusforge/dhi-redis/8-dev](./dhi-redis/8-dev/Dockerfile) |
+
+### MariaDB (DHI)
+
+[![MariaDB](https://github.com/ventusforge/docker-images/actions/workflows/dhi-mariadb.yml/badge.svg)](https://github.com/ventusforge/docker-images/actions/workflows/dhi-mariadb.yml)
+
+| Version  | Status        | Dockerfile                                                                |
+|:---------|:--------------|---------------------------------------------------------------------------|
+| `10`     | 🟢 **Stable** | [ghcr.io/ventusforge/dhi-mariadb/10](./dhi-mariadb/10/Dockerfile)         |
+| `10-dev` | 🟢 **Stable** | [ghcr.io/ventusforge/dhi-mariadb/10-dev](./dhi-mariadb/10-dev/Dockerfile) |
+| `11`     | 🟢 **Stable** | [ghcr.io/ventusforge/dhi-mariadb/11](./dhi-mariadb/11/Dockerfile)         |
+| `11-dev` | 🟢 **Stable** | [ghcr.io/ventusforge/dhi-mariadb/11-dev](./dhi-mariadb/11-dev/Dockerfile) |
+| `12`     | 🟢 **Stable** | [ghcr.io/ventusforge/dhi-mariadb/12](./dhi-mariadb/12/Dockerfile)         |
+| `12-dev` | 🟢 **Stable** | [ghcr.io/ventusforge/dhi-mariadb/12-dev](./dhi-mariadb/12-dev/Dockerfile) |
