@@ -1,0 +1,171 @@
+name: Build Docker Image
+
+on:
+  workflow_call:
+    inputs:
+      force-build-image:
+        type: boolean
+        required: false
+        default: false
+      docker-registry:
+        type: string
+        required: true
+      docker-image-owner:
+        type: string
+        required: true
+      docker-image-name:
+        type: string
+        required: true
+      docker-image-tag:
+        type: string
+        required: true
+      build-context:
+        type: string
+        required: true
+      vulnerability-scan-run:
+        type: boolean
+        default: true
+      vulnerability-scan-threshold:
+        type: string
+        default: CRITICAL
+      use-dhi-io:
+        type: boolean
+        default: false
+    secrets:
+      REGISTRY_USERNAME:
+        required: true
+        description: "Docker registry username"
+      REGISTRY_PASSWORD:
+        required: true
+        description: "Docker registry password"
+      DOCKER_HUB_USER:
+        required: false
+        description: "Docker Hub username"
+      DOCKER_HUB_TOKEN:
+        required: false
+        description: "Docker Hub token"
+      BUILD_SECRETS:
+        required: false
+        description: "Build secrets to be used during build"
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Log into ${{ inputs.docker-registry }}
+        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee
+        with:
+          registry: ${{ inputs.docker-registry }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      - name: Log into registry dhi.io
+        if: inputs.use-dhi-io == true
+        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee
+        with:
+          registry: dhi.io
+          username: ${{ secrets.DOCKER_HUB_USER }}
+          password: ${{ secrets.DOCKER_HUB_TOKEN }}
+
+      - name: Setup Docker buildx
+        uses: docker/setup-buildx-action@d7f5e7f509e45cec5c76c4d5afdd7de93d0b3df5
+
+      - name: Extract base image reference
+        id: base
+        working-directory: ${{ inputs.build-context }}
+        run: |
+          BASE_IMAGE=$(grep -E '^FROM[[:space:]]' Dockerfile | awk '{print $2}')
+          echo "ref=${BASE_IMAGE}" >> "$GITHUB_OUTPUT"
+          echo "tag=${BASE_IMAGE##*:}" >> "$GITHUB_OUTPUT"
+
+      - name: Resolve base image digest tag
+        id: base_digest
+        run: |
+          DIGEST=$(docker buildx imagetools inspect "${{ steps.base.outputs.ref }}" --format '{{.Manifest.Digest}}')
+          DIGEST_TAG="${DIGEST/:/-}"
+          echo "tag=${DIGEST_TAG}" >> "$GITHUB_OUTPUT"
+          if docker buildx imagetools inspect "${{ inputs.docker-registry }}/${{ inputs.docker-image-owner }}/${{ inputs.docker-image-name }}:${DIGEST_TAG}" > /dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Set up QEMU
+        if: steps.base_digest.outputs.exists != 'true' || inputs.force-build-image == true
+        uses: docker/setup-qemu-action@06116385d9baf250c9f4dcb4858b16962ea869c3
+        with:
+          platforms: linux/arm64
+
+      - name: Generate semver date tag
+        id: timestamp
+        if: steps.base_digest.outputs.exists != 'true' || inputs.force-build-image == true
+        run: |
+          INPUT="${{ inputs.docker-image-tag }}"
+          DATE=$(date -u +%Y.%m.%d)
+          HOUR=$(date -u +%H)
+          MINUTE=$(date -u +%M)
+          BUILD_STAMP="${DATE}.${HOUR}.${MINUTE}"
+          REST="${INPUT#v}"
+
+          if [[ "$REST" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)-(.+)$ ]]; then
+            TAG="${BASH_REMATCH[1]}.${BASH_REMATCH[2]}.${BASH_REMATCH[3]}-${BASH_REMATCH[4]}.${BASH_REMATCH[5]}.${BUILD_STAMP}"
+          elif [[ "$REST" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)-(.+)$ ]]; then
+            TAG="${BASH_REMATCH[1]}.${BASH_REMATCH[2]}.${BASH_REMATCH[3]}-${BASH_REMATCH[4]}.${BUILD_STAMP}"
+          elif [[ "$REST" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
+            TAG="${BASH_REMATCH[1]}.${BASH_REMATCH[2]}.${BASH_REMATCH[3]}-${BUILD_STAMP}"
+          elif [[ "$REST" =~ ^([0-9]+)\.([0-9]+)-(.+)$ ]]; then
+            TAG="${BASH_REMATCH[1]}.${BASH_REMATCH[2]}.0-${BASH_REMATCH[3]}.${BUILD_STAMP}"
+          elif [[ "$REST" =~ ^([0-9]+)\.([0-9]+)$ ]]; then
+            TAG="${BASH_REMATCH[1]}.${BASH_REMATCH[2]}.0-${BUILD_STAMP}"
+          elif [[ "$REST" =~ ^([0-9]+)-(.+)$ ]]; then
+            TAG="${BASH_REMATCH[1]}.0.0-${BASH_REMATCH[2]}.${BUILD_STAMP}"
+          else
+            TAG="${REST}-${BUILD_STAMP}"
+          fi
+
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+
+      - name: Extract Docker metadata
+        id: meta
+        if: steps.base_digest.outputs.exists != 'true' || inputs.force-build-image == true
+        uses: docker/metadata-action@80c7e94dd9b9319bd5eb7a0e0fe9291e23a2a2e9
+        with:
+          images: ${{ inputs.docker-registry }}/${{ inputs.docker-image-owner }}/${{ inputs.docker-image-name }}
+          tags: |
+            type=raw,value=${{ inputs.docker-image-tag }}
+            type=raw,value=${{ steps.base.outputs.tag }}
+            type=raw,value=${{ steps.timestamp.outputs.tag }}
+            type=raw,value=${{ steps.base_digest.outputs.tag }}
+
+
+      - name: Build and Push Docker Image ${{ inputs.docker-image-tag }}
+        if: steps.base_digest.outputs.exists != 'true' || inputs.force-build-image == true
+        uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf
+        with:
+          context: ${{ inputs.build-context }}
+          push: true
+          platforms: "linux/amd64,linux/arm64"
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          sbom: true
+          provenance: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          secrets: ${{ secrets.BUILD_SECRETS }}
+
+      - name: Scan for vulnerabilities
+        if: ${{ inputs.vulnerability-scan-run && steps.base_digest.outputs.exists != 'true' || inputs.force-build-image == true }}
+        uses: crazy-max/ghaction-container-scan@v4
+        with:
+          image: ${{ fromJSON(steps.meta.outputs.json).tags[0] }}
+          dockerfile: ${{ inputs.build-context }}/Dockerfile
+          annotations: true
+          severity_threshold: ${{ inputs.vulnerability-scan-threshold }}
+        env:
+          TRIVY_TIMEOUT: 10m
+          TRIVY_SCANNERS: 'vuln'
