@@ -37,3 +37,12 @@ The images marked with `(DHI)` are based on the [Docker Hardened Image (DHI)](ht
 |:----------|:--------------|-----------------------------------------------------------------------------|
 | `3.6`     | 🟢 **Stable** | [ghcr.io/ventusforge/dhi-traefik/3.6](./dhi-traefik/3.6/Dockerfile)         |
 | `3.6-dev` | 🟢 **Stable** | [ghcr.io/ventusforge/dhi-traefik/3.6-dev](./dhi-traefik/3.6-dev/Dockerfile) |
+
+### Redis
+
+[![Redis](https://github.com/ventusforge/docker-images/actions/workflows/dhi-redis.yml/badge.svg)](https://github.com/ventusforge/docker-images/actions/workflows/dhi-redis.yml)
+
+| Version | Status        | Dockerfile                                                          |
+|:--------|:--------------|---------------------------------------------------------------------|
+| `8`     | 🟢 **Stable** | [ghcr.io/ventusforge/dhi-redis/8](./dhi-redis/8/Dockerfile)         |
+| `8-dev` | 🟢 **Stable** | [ghcr.io/ventusforge/dhi-redis/8-dev](./dhi-redis/8-dev/Dockerfile) |
