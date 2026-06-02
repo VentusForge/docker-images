@@ -1,0 +1,12 @@
+services:
+  php8-3:
+    build: ./8.3-fpm-alpine
+    image: ghcr.io/ventusforge/php:8.3-fpm-alpine
+
+  php8-4:
+    build: ./8.4-fpm-alpine
+    image: ghcr.io/ventusforge/php:8.4-fpm-alpine
+
+  php8-5:
+    build: ./8.5-fpm-alpine
+    image: ghcr.io/ventusforge/php:8.5-fpm-alpine
