@@ -18,3 +18,13 @@ The images marked with `(DHI)` are based on the [Docker Hardened Image (DHI)](ht
 | `8.5-fpm-alpine` | 🟢 **Stable**      | [ghcr.io/ventusforge/php/8.5-fpm-alpine](./php/8.5-fpm-alpine/Dockerfile) |
 | `8.4-fpm-alpine` | 🟢 **Stable**      | [ghcr.io/ventusforge/php/8.4-fpm-alpine](./php/8.4-fpm-alpine/Dockerfile) |
 | `8.3-fpm-alpine` | 🟢 **Stable**      | [ghcr.io/ventusforge/php/8.3-fpm-alpine](./php/8.3-fpm-alpine/Dockerfile) |
+
+### Nginx (DHI)
+
+[![Nginx](https://github.com/ventusforge/docker-images/actions/workflows/dhi-nginx.yml/badge.svg)](https://github.com/ventusforge/docker-images/actions/workflows/dhi-nginx.yml)
+
+
+| Version        | Status        | Dockerfile                                                                        |
+|:---------------|:--------------|-----------------------------------------------------------------------------------|
+| `1-alpine`     | 🟢 **Stable** | [ghcr.io/ventusforge/dhi-nginx/1-alpine](./dhi-nginx/1-alpine/Dockerfile)         |
+| `1-alpine-dev` | 🟢 **Stable** | [ghcr.io/ventusforge/dhi-nginx/1-alpine-dev](./dhi-nginx/1-alpine-dev/Dockerfile) |
