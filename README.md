@@ -6,7 +6,14 @@ The images marked with `(DHI)` are based on the [Docker Hardened Image (DHI)](ht
 
 ---
 
+## How to use
+
+Make sure to use the version with a datetime string as the suffix so that dependabot can recognize bugfix updates and notify you when they are available.
+For example, use `ghcr.io/ventusforge/dhi-redis/8-2026.06.02.21.521` instead of `ghcr.io/ventusforge/dhi-redis:8`.
+
 ## Available images
+
+> :warning: **Note:** The `dev` images are not intended for production use. They are only used for development and testing purposes.
 
 ### PHP
 
