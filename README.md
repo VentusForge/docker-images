@@ -28,3 +28,12 @@ The images marked with `(DHI)` are based on the [Docker Hardened Image (DHI)](ht
 |:---------------|:--------------|-----------------------------------------------------------------------------------|
 | `1-alpine`     | 🟢 **Stable** | [ghcr.io/ventusforge/dhi-nginx/1-alpine](./dhi-nginx/1-alpine/Dockerfile)         |
 | `1-alpine-dev` | 🟢 **Stable** | [ghcr.io/ventusforge/dhi-nginx/1-alpine-dev](./dhi-nginx/1-alpine-dev/Dockerfile) |
+
+### Traefik (DHI)
+
+[![Traefik](https://github.com/ventusforge/docker-images/actions/workflows/dhi-traefik.yml/badge.svg)](https://github.com/ventusforge/docker-images/actions/workflows/dhi-traefik.yml)
+
+| Version   | Status        | Dockerfile                                                                  |
+|:----------|:--------------|-----------------------------------------------------------------------------|
+| `3.6`     | 🟢 **Stable** | [ghcr.io/ventusforge/dhi-traefik/3.6](./dhi-traefik/3.6/Dockerfile)         |
+| `3.6-dev` | 🟢 **Stable** | [ghcr.io/ventusforge/dhi-traefik/3.6-dev](./dhi-traefik/3.6-dev/Dockerfile) |

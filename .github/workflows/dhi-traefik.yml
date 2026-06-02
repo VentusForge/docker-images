@@ -1,0 +1,44 @@
+name: dhi-traefik
+
+on:
+  workflow_dispatch:
+    inputs:
+      force:
+        description: 'Force Build (skip SHA check)'
+        type: boolean
+        default: false
+  schedule:
+    - cron: '0 2 * * *'
+  push:
+    branches:
+      - main
+    paths:
+      - 'dhi-traefik/**'
+      - '.github/workflows/dhi-traefik.yml'
+
+jobs:
+  build:
+    uses: ./.github/workflows/_build-image.yml
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        version:
+          - "3.6"
+          - "3.6-dev"
+    with:
+      force-build-image: ${{ inputs.force == true }}
+      docker-registry: ghcr.io
+      docker-image-owner: ventusforge
+      docker-image-name: dhi-traefik
+      docker-image-tag: ${{ matrix.version }}
+      build-context: ./dhi-traefik/${{ matrix.version }}
+      vulnerability-scan-run: ${{ vars.DHI_TRAEFIK__VUL_SCAN == 'true' }}
+      use-dhi-io: true
+    secrets:
+      REGISTRY_USERNAME: ${{ github.actor }}
+      REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+      DOCKER_HUB_USER: ${{ secrets.GLOBAL_DOCKER_HUB_USER }}
+      DOCKER_HUB_TOKEN: ${{ secrets.GLOBAL_DOCKER_HUB_TOKEN }}
