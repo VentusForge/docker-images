@@ -1,1 +1,1 @@
-FROM dhi.io/mariadb:11-debian13-dev
+FROM dhi.io/mariadb:12-debian13-dev
