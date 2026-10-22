@@ -7,10 +7,11 @@ ARG PHP_YAML_VERSION="2.3.0"
 ENV LD_PRELOAD="/usr/lib/preloadable_libiconv.so php"
 
 # Custom PHP requirements
-RUN set -x \
+RUN --mount=type=bind,from=ghcr.io/php/pie:bin,source=/pie,target=/usr/local/bin/pie \
+    set -x \
     && mkdir -p /data \
     && apk --update add patch tar curl openssl sed libbz2 libxslt bzip2 libzip libuuid postgresql-dev icu-dev icu-data-full gettext-dev curl-dev libxml2-dev openldap-dev libpng libwebp libjpeg-turbo yaml libuuid oniguruma-dev gnu-libiconv \
-    && apk add --virtual .phpize-deps $PHPIZE_DEPS linux-headers libxslt-dev libzip-dev bzip2-dev libmcrypt-dev imagemagick-dev libtool freetype-dev libpng-dev libjpeg-turbo-dev libwebp-dev yaml-dev \
+    && apk add --virtual .phpize-deps $PHPIZE_DEPS linux-headers libxslt-dev libzip-dev bzip2-dev libmcrypt-dev imagemagick-dev libtool freetype-dev libpng-dev libjpeg-turbo-dev libwebp-dev yaml-dev unzip \
     && docker-php-ext-configure gd \
       --with-freetype \
       --with-jpeg \
@@ -33,7 +34,7 @@ RUN set -x \
     && docker-php-ext-install zip \
     && docker-php-ext-configure ldap --with-libdir=lib/ \
     && docker-php-ext-install ldap \
-    && pecl install imagick redis-${PHP_REDIS_VERSION} yaml-${PHP_YAML_VERSION} uuid \
+    && pie install --no-cache --no-system-dependencies-check imagick/imagick "phpredis/phpredis:${PHP_REDIS_VERSION}" "pecl/yaml:${PHP_YAML_VERSION}" pecl/uuid \
     && docker-php-ext-enable imagick \
     && docker-php-ext-enable redis \
     && docker-php-ext-enable yaml \

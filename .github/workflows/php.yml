@@ -32,12 +32,13 @@ jobs:
     with:
       force-build-image: ${{ inputs.force == true }}
       docker-registry: ghcr.io
-      docker-image-owner: ventusforge
+      docker-image-owner: erkenes
       docker-image-name: php
       docker-image-tag: ${{ matrix.version }}
       build-context: ./php/${{ matrix.version }}
       vulnerability-scan-run: ${{ vars.PHP__VUL_SCAN == 'true' }}
       use-dhi-io: false
+      qemu-platforms: 'linux/arm64'
     secrets:
       REGISTRY_USERNAME: ${{ github.actor }}
       REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
