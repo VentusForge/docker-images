@@ -68,3 +68,5 @@ For example, use `ghcr.io/ventusforge/dhi-redis/8-2026.06.02.21.521` instead of 
 | `11-dev` | 🟢 **Stable** | [ghcr.io/ventusforge/dhi-mariadb/11-dev](./dhi-mariadb/11-dev/Dockerfile) |
 | `12`     | 🟢 **Stable** | [ghcr.io/ventusforge/dhi-mariadb/12](./dhi-mariadb/12/Dockerfile)         |
 | `12-dev` | 🟢 **Stable** | [ghcr.io/ventusforge/dhi-mariadb/12-dev](./dhi-mariadb/12-dev/Dockerfile) |
+| `13`     | 🟢 **Stable** | [ghcr.io/ventusforge/dhi-mariadb/13](./dhi-mariadb/13/Dockerfile)         |
+| `13-dev` | 🟢 **Stable** | [ghcr.io/ventusforge/dhi-mariadb/13-dev](./dhi-mariadb/13-dev/Dockerfile) |

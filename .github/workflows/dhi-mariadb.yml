@@ -32,6 +32,8 @@ jobs:
           - "11-dev"
           - "12"
           - "12-dev"
+          - "13"
+          - "13-dev"
     with:
       force-build-image: ${{ inputs.force == true }}
       docker-registry: ghcr.io
