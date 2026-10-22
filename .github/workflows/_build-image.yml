@@ -87,7 +87,7 @@ jobs:
 
 
       - name: Set up QEMU
-        if: inputs.qemu-platforms != '' || inputs.qemu-platforms != 'false'
+        if: inputs.qemu-platforms != '' && inputs.qemu-platforms != 'false'
         uses: docker/setup-qemu-action@99012661954931238ded8c8b007157a8430204e1
         with:
           platforms: ${{ inputs.qemu-platforms }}
@@ -127,17 +127,17 @@ jobs:
           REST="${INPUT#v}"
 
           if [[ "$REST" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)-(.+)$ ]]; then
-            TAG="${BASH_REMATCH[1]}.${BASH_REMATCH[2]}.${BASH_REMATCH[3]}-${BASH_REMATCH[4]}.${BASH_REMATCH[5]}.${BUILD_STAMP}"
+            TAG="${BASH_REMATCH[1]}.${BASH_REMATCH[2]}.${BASH_REMATCH[3]}.${BASH_REMATCH[4]}.${BUILD_STAMP}-${BASH_REMATCH[5]}"
           elif [[ "$REST" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)-(.+)$ ]]; then
-            TAG="${BASH_REMATCH[1]}.${BASH_REMATCH[2]}.${BASH_REMATCH[3]}-${BASH_REMATCH[4]}.${BUILD_STAMP}"
+            TAG="${BASH_REMATCH[1]}.${BASH_REMATCH[2]}.${BASH_REMATCH[3]}.${BUILD_STAMP}-${BASH_REMATCH[4]}"
           elif [[ "$REST" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
-            TAG="${BASH_REMATCH[1]}.${BASH_REMATCH[2]}.${BASH_REMATCH[3]}-${BUILD_STAMP}"
+            TAG="${BASH_REMATCH[1]}.${BASH_REMATCH[2]}.${BASH_REMATCH[3]}.${BUILD_STAMP}"
           elif [[ "$REST" =~ ^([0-9]+)\.([0-9]+)-(.+)$ ]]; then
-            TAG="${BASH_REMATCH[1]}.${BASH_REMATCH[2]}.0-${BASH_REMATCH[3]}.${BUILD_STAMP}"
+            TAG="${BASH_REMATCH[1]}.${BASH_REMATCH[2]}.0.${BUILD_STAMP}-${BASH_REMATCH[3]}"
           elif [[ "$REST" =~ ^([0-9]+)\.([0-9]+)$ ]]; then
-            TAG="${BASH_REMATCH[1]}.${BASH_REMATCH[2]}.0-${BUILD_STAMP}"
+            TAG="${BASH_REMATCH[1]}.${BASH_REMATCH[2]}.0.${BUILD_STAMP}"
           elif [[ "$REST" =~ ^([0-9]+)-(.+)$ ]]; then
-            TAG="${BASH_REMATCH[1]}.0.0-${BASH_REMATCH[2]}.${BUILD_STAMP}"
+            TAG="${BASH_REMATCH[1]}.0.0.${BUILD_STAMP}-${BASH_REMATCH[2]}"
           else
             TAG="${REST}-${BUILD_STAMP}"
           fi
@@ -174,7 +174,7 @@ jobs:
           secrets: ${{ secrets.BUILD_SECRETS }}
 
       - name: Scan for vulnerabilities
-        if: ${{ inputs.vulnerability-scan-run && steps.base_digest.outputs.exists != 'true' || inputs.force-build-image == true }}
+        if: ${{ inputs.vulnerability-scan-run && (steps.base_digest.outputs.exists != 'true' || inputs.force-build-image == true) }}
         uses: crazy-max/ghaction-container-scan@v4
         with:
           image: ${{ fromJSON(steps.meta.outputs.json).tags[0] }}
