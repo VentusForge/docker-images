@@ -1,4 +1,4 @@
-FROM dhi.io/mariadb:13-debian13-dev
+FROM dhi.io/mariadb:13-debian-dev
 
 # Patch gawk (CVE-2026-40468, CVE-2026-40469) until the base image ships the fixed version
 USER root
