@@ -44,8 +44,6 @@ For example, use `ghcr.io/ventusforge/dhi-redis/8-2026.06.02.21.521` instead of 
 |:----------|:--------------|-----------------------------------------------------------------------------|
 | `3.7`     | 🟢 **Stable** | [ghcr.io/ventusforge/dhi-traefik/3.7](./dhi-traefik/3.7/Dockerfile)         |
 | `3.7-dev` | 🟢 **Stable** | [ghcr.io/ventusforge/dhi-traefik/3.7-dev](./dhi-traefik/3.7-dev/Dockerfile) |
-| `3.6`     | 🟢 **Stable** | [ghcr.io/ventusforge/dhi-traefik/3.6](./dhi-traefik/3.6/Dockerfile)         |
-| `3.6-dev` | 🟢 **Stable** | [ghcr.io/ventusforge/dhi-traefik/3.6-dev](./dhi-traefik/3.6-dev/Dockerfile) |
 
 ### Redis (DHI)
 
