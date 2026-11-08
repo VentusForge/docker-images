@@ -1,3 +1,3 @@
-FROM dhi.io/nginx:1-alpine3.24-dev
+FROM dhi.io/nginx:1-alpine-dev
 
 EXPOSE 8080
