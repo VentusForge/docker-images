@@ -70,3 +70,12 @@ For example, use `ghcr.io/ventusforge/dhi-redis/8-2026.06.02.21.521` instead of 
 | `12-dev` | 🟢 **Stable** | [ghcr.io/ventusforge/dhi-mariadb/12-dev](./dhi-mariadb/12-dev/Dockerfile) |
 | `13`     | 🟢 **Stable** | [ghcr.io/ventusforge/dhi-mariadb/13](./dhi-mariadb/13/Dockerfile)         |
 | `13-dev` | 🟢 **Stable** | [ghcr.io/ventusforge/dhi-mariadb/13-dev](./dhi-mariadb/13-dev/Dockerfile) |
+
+### Alpine Base (DHI)
+
+[![Alpine Base](https://github.com/ventusforge/docker-images/actions/workflows/dhi-alpine.yml/badge.svg)](https://github.com/ventusforge/docker-images/actions/workflows/dhi-alpine.yml)
+
+| Version    | Status        | Dockerfile                                                                  |
+|:-----------|:--------------|-----------------------------------------------------------------------------|
+| `3.24`     | 🟢 **Stable** | [ghcr.io/ventusforge/dhi-alpine/3.24](./dhi-alpine/3.24/Dockerfile)         |
+| `3.24-dev` | 🟢 **Stable** | [ghcr.io/ventusforge/dhi-alpine/3.24-dev](./dhi-alpine/3.24-dev/Dockerfile) |

@@ -1,0 +1,1 @@
+FROM dhi.io/alpine-base:3.24-dev
