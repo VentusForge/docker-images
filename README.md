@@ -88,3 +88,11 @@ For example, use `ghcr.io/ventusforge/dhi-redis/8-2026.06.02.21.521` instead of 
 | Version          | Status        | Dockerfile                                                                                                            |
 |:-----------------|:--------------|-----------------------------------------------------------------------------------------------------------------------|
 | `3.9-debian`     | 🟢 **Stable** | [ghcr.io/ventusforge/dhi-opensearch-dashboards/3.9-debian](./dhi-opensearch-dashboards/3.9-debian/Dockerfile)         |
+
+### Eclipse MQTT
+
+[![MQTT](https://github.com/ventusforge/docker-images/actions/workflows/dhi-mqtt.yml/badge.svg)](https://github.com/ventusforge/docker-images/actions/workflows/dhi-mqtt.yml)
+
+| Version      | Status        | Dockerfile                                                                  |
+|:-------------|:--------------|-----------------------------------------------------------------------------|
+| `2.1-debian` | 🟢 **Stable** | [ghcr.io/ventusforge/dhi-mqtt/2.1-debian](./dhi-mqtt/2.1-debian/Dockerfile) |
