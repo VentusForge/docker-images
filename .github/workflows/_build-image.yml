@@ -115,38 +115,59 @@ jobs:
             echo "exists=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Generate semver date tag
-        id: timestamp
-        if: steps.base_digest.outputs.exists != 'true' || inputs.force-build-image == true
+      - name: Decide whether to build
+        id: decide
         run: |
-          INPUT="${{ inputs.docker-image-tag }}"
-          DATE=$(date -u +%Y.%m.%d)
-          HOUR=$(date -u +%H)
-          MINUTE=$(date -u +%M)
-          BUILD_STAMP="${DATE}.${HOUR}.${MINUTE}"
-          REST="${INPUT#v}"
-
-          if [[ "$REST" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)-(.+)$ ]]; then
-            TAG="${BASH_REMATCH[1]}.${BASH_REMATCH[2]}.${BASH_REMATCH[3]}.${BASH_REMATCH[4]}.${BUILD_STAMP}-${BASH_REMATCH[5]}"
-          elif [[ "$REST" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)-(.+)$ ]]; then
-            TAG="${BASH_REMATCH[1]}.${BASH_REMATCH[2]}.${BASH_REMATCH[3]}.${BUILD_STAMP}-${BASH_REMATCH[4]}"
-          elif [[ "$REST" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
-            TAG="${BASH_REMATCH[1]}.${BASH_REMATCH[2]}.${BASH_REMATCH[3]}.${BUILD_STAMP}"
-          elif [[ "$REST" =~ ^([0-9]+)\.([0-9]+)-(.+)$ ]]; then
-            TAG="${BASH_REMATCH[1]}.${BASH_REMATCH[2]}.0.${BUILD_STAMP}-${BASH_REMATCH[3]}"
-          elif [[ "$REST" =~ ^([0-9]+)\.([0-9]+)$ ]]; then
-            TAG="${BASH_REMATCH[1]}.${BASH_REMATCH[2]}.0.${BUILD_STAMP}"
-          elif [[ "$REST" =~ ^([0-9]+)-(.+)$ ]]; then
-            TAG="${BASH_REMATCH[1]}.0.0.${BUILD_STAMP}-${BASH_REMATCH[2]}"
+          # Build when the base image changed, when forced, or when the image's
+          # files changed (push to main). Without the push case a Dockerfile change
+          # on an unchanged base image would never produce a new timestamp tag.
+          if [[ "${{ steps.base_digest.outputs.exists }}" != "true" \
+             || "${{ inputs.force-build-image }}" == "true" \
+             || "${{ github.event_name }}" == "push" ]]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
           else
-            TAG="${REST}-${BUILD_STAMP}"
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "Base image digest unchanged, skipping build."
           fi
 
+      - name: Generate timestamp version tag
+        id: timestamp
+        if: steps.decide.outputs.run == 'true'
+        env:
+          INPUT_TAG: ${{ inputs.docker-image-tag }}
+        run: |
+          # Tag format: <major>.<minor>.<patch>.<YYYYMMDDHHMM>[-<variant>][-dev]
+          #
+          # Dependabot only compares tags with the same suffix and the same tag format,
+          # and sorts them by the numeric version in front of the suffix. Therefore:
+          # - the build timestamp is part of the numeric version, never of the suffix.
+          #   It must be separated by a dot: after a dash Dependabot reads the long
+          #   number as a commit SHA and treats the tag as a different format
+          # - the version is always padded to three parts, so all variants of an image
+          #   (normal and -dev) share one format and one precision
+          # - the suffix (e.g. -alpine, -fpm-alpine, -dev) stays identical across builds.
+          #   Dependabot treats "-dev" tags as pre-releases: images pinned to a normal
+          #   tag never get a -dev update and vice versa.
+          BUILD_STAMP="$(date -u +%Y%m%d%H%M)"
+          REST="${INPUT_TAG#v}"
+          if [[ ! "$REST" =~ ^([0-9]+(\.[0-9]+)*)(-[a-z][a-z0-9.-]*)?$ ]]; then
+            echo "::error::Tag '${INPUT_TAG}' must look like <version>[-<suffix>], e.g. 8, 3.24, 1-alpine, 8.4-fpm-alpine or 3.9-debian-dev"
+            exit 1
+          fi
+  
+          VERSION="${BASH_REMATCH[1]}"
+          SUFFIX="${BASH_REMATCH[3]}"
+          IFS='.' read -r -a PARTS <<< "$VERSION"
+          while [[ ${#PARTS[@]} -lt 3 ]]; do PARTS+=(0); done
+          VERSION="$(IFS='.'; echo "${PARTS[*]}")"
+
+          TAG="${VERSION}.${BUILD_STAMP}${SUFFIX}"
+          echo "Timestamp tag: ${TAG}"
           echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
 
       - name: Extract Docker metadata
         id: meta
-        if: steps.base_digest.outputs.exists != 'true' || inputs.force-build-image == true
+        if: steps.decide.outputs.run == 'true'
         uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302
         with:
           images: |
@@ -159,7 +180,7 @@ jobs:
             type=raw,value=${{ steps.base_digest.outputs.tag }}
 
       - name: Build and Push Docker Image ${{ inputs.docker-image-tag }}
-        if: steps.base_digest.outputs.exists != 'true' || inputs.force-build-image == true
+        if: steps.decide.outputs.run == 'true'
         uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc
         with:
           context: ${{ inputs.build-context }}
@@ -174,7 +195,7 @@ jobs:
           secrets: ${{ secrets.BUILD_SECRETS }}
 
       - name: Scan for vulnerabilities
-        if: ${{ inputs.vulnerability-scan-run && (steps.base_digest.outputs.exists != 'true' || inputs.force-build-image == true) }}
+        if: ${{ inputs.vulnerability-scan-run && steps.decide.outputs.run == 'true' }}
         uses: crazy-max/ghaction-container-scan@v4
         with:
           image: ${{ fromJSON(steps.meta.outputs.json).tags[0] }}
