@@ -1,4 +1,4 @@
-FROM php:8.3-fpm-alpine
+FROM php:8.5-fpm-alpine
 
 # Build arguments
 ARG PHP_REDIS_VERSION="6.3.0"
